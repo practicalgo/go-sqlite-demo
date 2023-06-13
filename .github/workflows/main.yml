@@ -1,0 +1,28 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  example_matrix:
+    strategy:
+      matrix:
+        version: [1.20]
+        os: [macos-13, ubuntu-22.04, windows-2019, windows-2022]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: ${{ matrix.version }}
+
+    - name: Build
+      run: go build -v ./...
+
+    - name: Test
+      run: go test -v ./...
