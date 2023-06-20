@@ -8,6 +8,10 @@ import (
 
 func TestInsertAndQueryData(t *testing.T) {
 
+	t.Cleanup(func() {
+		db.Close()
+	})
+
 	dbPath := path.Join(t.TempDir(), "app.db")
 	err := initDatabase(dbPath)
 	if err != nil {
