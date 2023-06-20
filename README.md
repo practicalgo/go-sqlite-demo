@@ -1,5 +1,8 @@
 # Project to demo SQLite + Go
 
+[![Build and Test](https://github.com/practicalgo/go-sqlite-demo/actions/workflows/main.yml/badge.svg)](https://github.com/practicalgo/go-sqlite-demo/actions/workflows/main.yml)
+
+
 This repository contains an illustration of how to interact with a SQLite
 database using `database/sql` and `https://pkg.go.dev/modernc.org/sqlite`.
 
