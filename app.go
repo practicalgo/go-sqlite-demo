@@ -29,7 +29,12 @@ func initDatabase(dbPath string) error {
 	}
 	_, err = db.ExecContext(
 		context.Background(),
-		`CREATE TABLE IF NOT EXISTS album (id INTEGER, title TEXT NOT NULL, artist TEXT NOT NULL, price REAL NOT NULL)`,
+		`CREATE TABLE IF NOT EXISTS album (
+			id INTEGER PRIMARY KEY AUTOINCREMENT, 
+			title TEXT NOT NULL, 
+			artist TEXT NOT NULL, 
+			price REAL NOT NULL
+		)`,
 	)
 	if err != nil {
 		return err
@@ -42,31 +47,49 @@ func addAlbum(a *Album) (int64, error) {
 		context.Background(),
 		`INSERT INTO album (title, artist, price) VALUES (?,?,?);`, a.Title, a.Artist, a.Price,
 	)
-	rows, err := result.RowsAffected()
+	id, err := result.LastInsertId()
 	if err != nil {
 		return 0, err
 	}
-	return rows, nil
+	return id, nil
 }
 
-func albumsByArtist(artist string) ([]*AlbumDbRow, error) {
-	result, err := db.QueryContext(
+func albumsByArtist(artist string) ([]AlbumDbRow, error) {
+
+	var albums []AlbumDbRow
+	rows, err := db.QueryContext(
 		context.Background(),
-		`INSERT INTO album (title, artist, price) VALUES (?,?,?);`, a.Title, a.Artist, a.Price,
+		`SELECT * FROM album WHERE artist=?;`, artist,
 	)
-	rows, err := result.RowsAffected()
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
-	return rows, nil
-
-	return nil, nil
+	defer rows.Close()
+	for rows.Next() {
+		var album AlbumDbRow
+		if err := rows.Scan(
+			&album.ID, &album.Title, &album.Artist, &album.Price,
+		); err != nil {
+			return nil, err
+		}
+		albums = append(albums, album)
+	}
+	return albums, err
 }
 
-func albumByID(id int) (*AlbumDbRow, error) {
-	return nil, nil
+func albumByID(id int) (AlbumDbRow, error) {
+	var album AlbumDbRow
+	row := db.QueryRowContext(
+		context.Background(),
+		`SELECT * FROM album WHERE id=?`, id,
+	)
+	err := row.Scan(&album.ID, &album.Title, &album.Artist, &album.Price)
+	if err != nil {
+		return album, err
+	}
+	return album, nil
 }
 
 func main() {
-	fmt.Println("HELLO")
+	fmt.Println("HELLO WORLD. Please run go test")
 }

@@ -21,10 +21,10 @@ func TestInsertAndQueryData(t *testing.T) {
 		{"Blue Train", "John Coltrane", 56.99},
 	}
 
-	for _, album := range testData {
-		rowCnt, err := addAlbum(&album)
-		if rowCnt != 1 {
-			t.Fatalf("expected inserted row count: 1, got: %d", rowCnt)
+	for idx, album := range testData {
+		lastInsertId, err := addAlbum(&album)
+		if lastInsertId != int64(idx+1) {
+			t.Fatalf("expected inserted ID: %d, got: %d", idx+1, lastInsertId)
 		}
 		if err != nil {
 			t.Fatalf("error inserting row: %v", err)
@@ -40,8 +40,19 @@ func TestInsertAndQueryData(t *testing.T) {
 		t.Fatalf("error querying data: %v", err)
 	}
 
-	if !reflect.DeepEqual(gotAlbums, expectedAlbums) {
-		t.Fatalf("expected: %#v, got: %#v", expectedAlbums, gotAlbums)
+	if len(gotAlbums) != len(expectedAlbums) {
+		t.Fatalf("expected to get: %d albums as result, got: %d", len(expectedAlbums), len(gotAlbums))
+	}
+
+	gotAlbumMap := make(map[int]AlbumDbRow)
+	for _, a := range gotAlbums {
+		gotAlbumMap[a.ID] = a
+	}
+
+	for _, a := range expectedAlbums {
+		if _, ok := gotAlbumMap[a.ID]; !ok {
+			t.Error("expected to get album with ID:", a.ID)
+		}
 	}
 
 	expectedAlbum := AlbumDbRow{
