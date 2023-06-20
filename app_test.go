@@ -1,18 +1,23 @@
 package main
 
 import (
+	"os"
 	"path"
 	"reflect"
 	"testing"
 )
 
 func TestInsertAndQueryData(t *testing.T) {
+	dbPath := path.Join(t.TempDir(), "app.db")
 
+	// we close the DB connection
+	// and remove the DB path explicitly for Windows
+	// https://github.com/practicalgo/go-sqlite-demo/actions/runs/5319761510/jobs/9632645015
 	t.Cleanup(func() {
 		db.Close()
+		os.RemoveAll(dbPath)
 	})
 
-	dbPath := path.Join(t.TempDir(), "app.db")
 	err := initDatabase(dbPath)
 	if err != nil {
 		t.Fatal("error initializing database: ", err)
