@@ -2,6 +2,7 @@ package main
 
 import (
 	"path"
+	"reflect"
 	"testing"
 )
 
@@ -10,42 +11,47 @@ func TestInsertAndQueryData(t *testing.T) {
 	dbPath := path.Join(t.TempDir(), "app.db")
 	err := initDatabase(dbPath)
 	if err != nil {
-		t.Fatalf("error initializing database: ", err)
+		t.Fatal("error initializing database: ", err)
 	}
 
 	testData := []Album{
-		{"Blue Train", "John Coltrane", 56.99},
 		{"Giant Steps", "John Coltrane", 63.99},
 		{"Jeru", "Gerry Mulligan", 17.99},
 		{"Sarah Vaughan", "Sarah Vaughan", 34.98},
+		{"Blue Train", "John Coltrane", 56.99},
 	}
 
 	for _, album := range testData {
-		rowCnt, err := insertData(album)
+		rowCnt, err := addAlbum(&album)
 		if rowCnt != 1 {
 			t.Fatalf("expected inserted row count: 1, got: %d", rowCnt)
 		}
 		if err != nil {
-			t.Fatalf("error inserting row: %v", album)
+			t.Fatalf("error inserting row: %v", err)
 		}
 	}
 
-	for idx, album := range testData {
-		gotAlbum, err := queryData(album.Title)
-		if err != nil {
-			t.Fatalf("error inserting row: %v", album)
-		}
+	expectedAlbums := []AlbumDbRow{
+		{4, Album{"Blue Train", "John Coltrane", 56.99}},
+		{1, Album{"Giant Steps", "John Coltrane", 63.99}},
+	}
+	gotAlbums, err := albumsByArtist("John Coltrane")
+	if err != nil {
+		t.Fatalf("error querying data: %v", err)
+	}
 
-		if gotAlbum.ID != idx {
-			t.Errorf("id doesn't match. expected: %s, got: %s", idx, gotAlbum.ID)
-		}
+	if !reflect.DeepEqual(gotAlbums, expectedAlbums) {
+		t.Fatalf("expected: %#v, got: %#v", expectedAlbums, gotAlbums)
+	}
 
-		if gotAlbum.Artist != album.Artist {
-			t.Errorf("artist doesn't match. expected: %s, got: %s", album.Artist, gotAlbum.Artist)
-		}
-
-		if gotAlbum.Price != album.Price {
-			t.Errorf("price doesn't match. expected: %s, got: %s", album.Price, gotAlbum.Price)
-		}
+	expectedAlbum := AlbumDbRow{
+		3, Album{"Sarah Vaughan", "Sarah Vaughan", 34.98},
+	}
+	gotAlbum, err := albumByID(expectedAlbum.ID)
+	if err != nil {
+		t.Fatal("expected non-nil error, got:", err)
+	}
+	if !reflect.DeepEqual(expectedAlbum, gotAlbum) {
+		t.Fatalf("expected: %#v, got: %#v", expectedAlbum, gotAlbum)
 	}
 }
