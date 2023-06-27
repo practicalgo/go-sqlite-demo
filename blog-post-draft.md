@@ -134,7 +134,43 @@ func albumByID(id int) (AlbumDbRow, error) {
 ```
 
 
+```
+SQLITE_DB_PATH=app.db ./go-sqlite-demo
+2023/06/27 13:13:54 recreating table: album
+database initialized..
+test data inserted..
+querying test data by album ID..
+{1 {Giant Steps John Coltrane 63.99}}
+{2 {Jeru Gerry Mulligan 17.99}}
+{3 {Sarah Vaughan Sarah Vaughan 34.98}}
+{4 {Blue Train John Coltrane 56.99}}
+```
+
 ## Using sqlite3 to interact with the database 
+
+```
+[echorand@serenity go-sqlite-demo]$ sqlite3 app.db
+SQLite version 3.42.0 2023-05-16 12:36:15
+Enter ".help" for usage hints.
+sqlite> .tables
+album
+sqlite> .database
+main: /home/echorand/work/github.com/practicalgo/go-sqlite-demo/app.db r/w
+sqlite> .schema album
+CREATE TABLE album (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        title TEXT NOT NULL,
+                        artist TEXT NOT NULL,
+                        price REAL NOT NULL
+                );
+sqlite> select * from album
+   ...> ;
+1|Giant Steps|John Coltrane|63.9900016784668
+2|Jeru|Gerry Mulligan|17.9899997711182
+3|Sarah Vaughan|Sarah Vaughan|34.9799995422363
+4|Blue Train|John Coltrane|56.9900016784668
+
+```
 
 ## Conclusion
 

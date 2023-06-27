@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
+	"os"
 
 	_ "modernc.org/sqlite"
 )
@@ -29,7 +31,8 @@ func initDatabase(dbPath string) error {
 	}
 	_, err = db.ExecContext(
 		context.Background(),
-		`CREATE TABLE IF NOT EXISTS album (
+		`DROP TABLE IF EXISTS album;
+		 CREATE TABLE album (
 			id INTEGER PRIMARY KEY AUTOINCREMENT, 
 			title TEXT NOT NULL, 
 			artist TEXT NOT NULL, 
@@ -91,5 +94,34 @@ func albumByID(id int) (AlbumDbRow, error) {
 }
 
 func main() {
-	fmt.Println("HELLO WORLD. Please run go test")
+
+	dbPath := os.Getenv("SQLITE_DB_PATH")
+	if len(dbPath) == 0 {
+		log.Fatal("specify the SQLITE_DB_PATH environment variable")
+	}
+	err := initDatabase(dbPath)
+	if err != nil {
+		log.Fatal("error initializing DB connection: ", err)
+	}
+	err = db.Ping()
+	if err != nil {
+		log.Fatal("error initializing DB connection: ping error: ", err)
+	}
+	fmt.Println("database initialized..")
+	err = insertTestData()
+	if err != nil {
+		log.Fatal("error inserting test data: ", err)
+	}
+	fmt.Println("test data inserted..")
+
+	fmt.Println("querying test data by album ID..")
+	// query back each record with IDs 1 - 4
+	for i := 1; i <= 4; i++ {
+		album, err := albumByID(i)
+		if err != nil {
+			fmt.Printf("error querying album ID: %d, %s\n", i, err)
+		} else {
+			fmt.Printf("%v\n", album)
+		}
+	}
 }

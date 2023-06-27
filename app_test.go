@@ -11,21 +11,9 @@ func TestInsertAndQueryData(t *testing.T) {
 		t.Fatal("error initializing database: ", err)
 	}
 
-	testData := []Album{
-		{"Giant Steps", "John Coltrane", 63.99},
-		{"Jeru", "Gerry Mulligan", 17.99},
-		{"Sarah Vaughan", "Sarah Vaughan", 34.98},
-		{"Blue Train", "John Coltrane", 56.99},
-	}
-
-	for idx, album := range testData {
-		lastInsertId, err := addAlbum(&album)
-		if lastInsertId != int64(idx+1) {
-			t.Fatalf("expected inserted ID: %d, got: %d", idx+1, lastInsertId)
-		}
-		if err != nil {
-			t.Fatalf("error inserting row: %v", err)
-		}
+	insertErr := insertTestData()
+	if insertErr != nil {
+		t.Fatal(insertErr)
 	}
 
 	expectedAlbums := []AlbumDbRow{
