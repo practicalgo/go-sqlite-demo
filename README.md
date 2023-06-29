@@ -22,6 +22,6 @@ we can persist data to a SQL database from Go.
 It's CGO free which means, we don't have to worry about installation woes
 (potential) on different operating systems and architecture
 
-## Explanations of the code 
+## Brief explanations of the code 
 
-See [this blog post](TBD).
+See [this blog post](https://practicalgobook.net/posts/go-sqlite-no-cgo/).
