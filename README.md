@@ -6,7 +6,7 @@
 This repository contains an illustration of how to interact with a SQLite
 database using `database/sql` and `https://pkg.go.dev/modernc.org/sqlite`.
 
-The example is intentionally chosen to match that of the official Go Project
+The example is intentionally chosen to losely match that of the official Go Project
 tutorial, [Accessing a relational database](https://go.dev/doc/tutorial/database-access)
 which uses MySQL as the database server.
 
